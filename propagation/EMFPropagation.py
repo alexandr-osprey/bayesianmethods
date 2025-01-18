@@ -25,6 +25,7 @@ class EMFPropagation(BaseModel):
             new_footprint_dist = pmf.get_factor(node=footprint, node_type=NodeType.Clique, marginalize=True)
             for emf in old_emfs:
                 old_footprint_dist = self._get_emf_footprint_dist(emf, footprint)
+                #skills_only = old_footprint_dist.normalize(inplace=False)
                 coefs = new_footprint_dist / old_footprint_dist
                 updated_emf = emf * coefs
                 pure_item = updated_emf.marginalize(variables=footprint, inplace=False).normalize(inplace=False)

@@ -21,16 +21,14 @@ class PMFTree(BaseModel):
     all_skills_dist: dict[str, np.ndarray] = None
     clique_nodes: frozenset[Footprint] = frozenset()
     clique_elements: frozenset[str] = frozenset()
-
+    skills_edges: list[tuple]
+    
     def model_post_init(self, __context):
         self._set_elements()
         return super().model_post_init(__context)
 
     class Config:
-        arbitrary_types_allowed = True 
-
-    def get_all_skills(self) -> frozenset[str]:
-        return self.clique_elements
+        arbitrary_types_allowed = True
 
     def set_factor(self, node: Footprint, factor: DiscreteFactor, node_type: NodeType) -> None:
         if node_type == NodeType.Clique:
@@ -182,4 +180,3 @@ class PMFTree(BaseModel):
 
         self.joint_factor = reduce(np.multiply, mean_factors)
         self.joint_factor.normalize()
-        

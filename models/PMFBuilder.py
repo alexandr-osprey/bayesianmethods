@@ -8,6 +8,7 @@ from pgmpy.factors.discrete import DiscreteFactor
 class PMFBuilder(BaseModel):
     full_model: BayesianNetwork
     emf_footprints: list[Footprint]
+    skills_edges: list[tuple]
 
     class Config:
         arbitrary_types_allowed = True 
@@ -93,7 +94,8 @@ class PMFBuilder(BaseModel):
             clique_neighbors=cliques_neighbours, 
             redundant_footprints_mapping=redundant_footprints_mapping,
             junction_factors=junctions_factors, 
-            junction_neighbors=junctions_neighbors)
+            junction_neighbors=junctions_neighbors,
+            skills_edges=self.skills_edges)
 
         return pmf
     
