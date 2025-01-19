@@ -12,7 +12,7 @@ from typed_logging.LoggerConfig import LoggerConfig, LoggerModeEnum
 from datetime import datetime
 import pgmpy
 import inject
-from visualization.pmf_visualization import PMFVisualization
+from visualization.PMFVisualization import PMFVisualization
 
 def print_cpd(cpd):
     backup = TabularCPD._truncate_strtable
@@ -73,22 +73,22 @@ visualization.pmf_map()
 visualization.pmf_dist("before")
 skill_1_true = DiscreteFactor(["s1"], cardinality=[2], values=[0, 1])
 #belief_updater.condition_on_skill(skill_1_true)
-belief_updater.propagate_evidence(('item6', 1))
-belief_updater.propagate_evidence(('item8', 1))
-belief_updater.propagate_evidence(('item12', 0))
-belief_updater.propagate_evidence(('item14', 0))
-belief_updater.propagate_evidence(('item16', 0))
-belief_updater.propagate_evidence(('item9', 1))
-belief_updater.propagate_evidence(('item4', 1))
-belief_updater.propagate_evidence(('item11', 1))
-belief_updater.propagate_evidence(('item17', 1))
-belief_updater.propagate_evidence(('item20', 1))
-belief_updater.propagate_evidence(('item18', 0))
-belief_updater.propagate_evidence(('item15', 0))
-belief_updater.propagate_evidence(('item7', 0))
-belief_updater.propagate_evidence(('item19', 0))
-belief_updater.propagate_evidence(('item10', 0))
-visualization.pmf_dist("after")
+# belief_updater.propagate_evidence(('item6', 1))
+# belief_updater.propagate_evidence(('item8', 1))
+# belief_updater.propagate_evidence(('item12', 0))
+# belief_updater.propagate_evidence(('item14', 0))
+# belief_updater.propagate_evidence(('item16', 0))
+# belief_updater.propagate_evidence(('item9', 1))
+# belief_updater.propagate_evidence(('item4', 1))
+# belief_updater.propagate_evidence(('item11', 1))
+# belief_updater.propagate_evidence(('item17', 1))
+# belief_updater.propagate_evidence(('item20', 1))
+# belief_updater.propagate_evidence(('item18', 0))
+# belief_updater.propagate_evidence(('item15', 0))
+# belief_updater.propagate_evidence(('item7', 0))
+# belief_updater.propagate_evidence(('item19', 0))
+# belief_updater.propagate_evidence(('item10', 0))
+# visualization.pmf_dist("after")
 print(scope)
 
 # %%

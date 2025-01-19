@@ -5,7 +5,7 @@ import pandas as pd
 import numpy as np
 from functools import reduce
 from enum import Enum
-
+import networkx as nx
 
 class NodeType(Enum):
     Clique = 1,
