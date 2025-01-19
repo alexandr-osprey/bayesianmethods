@@ -67,4 +67,3 @@ class PMFVisualization(BaseModel):
             node_colors.append(color)
         nx.draw(G, pos, with_labels=True, labels=labels, node_size=2000, font_size=10, node_color=node_colors)
         plt.title("Junction tree")
-        

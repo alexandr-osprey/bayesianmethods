@@ -49,10 +49,11 @@ class BeliefUpdater(BaseModel):
 
     def _get_p_new(self, emf: DiscreteFactor, evidence: tuple) -> DiscreteFactor:
         variables = emf.variables.copy()
+        index = emf.state_names[evidence[0]].index(evidence[1])
         evidence_var_index = emf.variables.index(evidence[0])
         variables.pop(evidence_var_index)
         cardinality = np.delete(emf.cardinality, evidence_var_index)
-        values = np.take(emf.values, evidence[1], axis=evidence_var_index)
+        values = np.take(emf.values, index, axis=evidence_var_index)
         factor = DiscreteFactor(variables, cardinality=cardinality, values=values)
 
         return factor
