@@ -54,7 +54,9 @@ class BeliefUpdater(BaseModel):
         variables.pop(evidence_var_index)
         cardinality = np.delete(emf.cardinality, evidence_var_index)
         values = np.take(emf.values, index, axis=evidence_var_index)
-        factor = DiscreteFactor(variables, cardinality=cardinality, values=values)
+        state_names = emf.state_names.copy()
+        state_names.pop(evidence[0])
+        factor = DiscreteFactor(variables, cardinality=cardinality, values=values, state_names=state_names)
 
         return factor
     

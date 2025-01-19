@@ -9,9 +9,9 @@ from typed_logging.LogEntry import LogEntry
 from models.Footprint import Footprint
 
 class JSONDeserializer:    
-    def parse_entry(self, entry_dict: dict, instance: bool = False):
+    def parse_entry(self, entry_dict: dict, parse_message: bool = False) -> LogEntry:
         message = entry_dict[Constants.MESSAGE]
-        if instance:
+        if parse_message:
             message = self._get_log_message_instance(message[Constants.LOG_EVENT], self.parse_message(message))
         log_entry = LogEntry(
             timestamp=self.parse_datetime(entry_dict[Constants.TIMESTAMP]),
@@ -48,7 +48,8 @@ class JSONDeserializer:
             return DiscreteFactor(
                 variables=message[Constants.VARIABLES],
                 cardinality=message[Constants.CARDINALITY],
-                values=message[Constants.VALUES])
+                values=message[Constants.VALUES],
+                state_names=message[Constants.STATE_NAMES])
         
         if isinstance(message, list):
             return [self.parse_message(v) for v in message]
@@ -67,8 +68,8 @@ class JSONDeserializer:
     
     def _get_log_message_instance(self, log_event: str, data: dict):
         match LogEventEnum[log_event]:
-            case LogEventEnum.InitialPMF:
-                return LogMessage.InitialPMFMessage(**data)
+            case LogEventEnum.EvidenceCalculated:
+                return LogMessage.EvidenceCalulatedMessage(**data)
             case LogEventEnum.EMFUpdate:
                 return LogMessage.EMFUpdateMessage(**data)
             case LogEventEnum.PMFNodeUpdated:

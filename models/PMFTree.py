@@ -5,7 +5,6 @@ import pandas as pd
 import numpy as np
 from functools import reduce
 from enum import Enum
-import networkx as nx
 
 class NodeType(Enum):
     Clique = 1,
@@ -18,10 +17,10 @@ class PMFTree(BaseModel):
     junction_neighbors: dict[Footprint, frozenset[Footprint]]
     redundant_footprints_mapping: dict[Footprint, Footprint] = {}
     joint_factor: DiscreteFactor = None
-    all_skills_dist: dict[str, np.ndarray] = None
+    all_skills_dist: list[DiscreteFactor] = None
     clique_nodes: frozenset[Footprint] = frozenset()
     clique_elements: frozenset[str] = frozenset()
-    skills_edges: list[tuple]
+    skills_edges: list[tuple[str, str]]
     
     def model_post_init(self, __context):
         self._set_elements()
@@ -57,7 +56,7 @@ class PMFTree(BaseModel):
         self._set_joint_factor()
         return self.joint_factor
     
-    def get_skills_distributions(self) -> dict:
+    def get_skills_distributions(self) -> list[DiscreteFactor]:
         self._set_joint_factor()
         return self.all_skills_dist
     
@@ -159,13 +158,12 @@ class PMFTree(BaseModel):
             for v in factor.variables:
                 marginalize_out = [vv for vv in factor.variables if vv != v]
                 marginalized = factor.marginalize(marginalize_out, inplace=False)
-                factors: list = distributions.get(v, [])
+                factors: list[DiscreteFactor] = distributions.get(v, [])
                 factors.append(marginalized)
                 distributions[v] = factors
         
-        mean_factors = []
         ordered_elements = sorted(self.clique_elements)
-        self.all_skills_dist = {}
+        self.all_skills_dist = []
         for element in ordered_elements:
             factors = distributions[element]
             values = [f.normalize(inplace=False).values for f in factors]
@@ -174,9 +172,9 @@ class PMFTree(BaseModel):
             for v in std:
                 if v > 0.1:
                     raise Exception("PMF does not converge")
-            mean_factor = DiscreteFactor(factors[0].variables, factors[0].cardinality, mean_values)
-            mean_factors.append(mean_factor)
-            self.all_skills_dist[element] = mean_values
+            mean_factor = DiscreteFactor(factors[0].variables, factors[0].cardinality, mean_values, factors[0].state_names)
+            mean_factor.normalize()
+            self.all_skills_dist.append(mean_factor)
 
-        self.joint_factor = reduce(np.multiply, mean_factors)
+        self.joint_factor = reduce(np.multiply, self.all_skills_dist)
         self.joint_factor.normalize()

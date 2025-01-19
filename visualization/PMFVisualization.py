@@ -21,7 +21,7 @@ class PMFVisualization(BaseModel):
     def pmf_dist(self, label: str):
         dist = self.pmf.all_skills_dist
 
-        df = pd.DataFrame(data=dist, index=['no', 'yes'])
+        df = pd.DataFrame(data=dist)
         df.T.plot(kind="bar", stacked=True, figsize=(8,6), colormap="viridis")
 
         plt.title('Stacked Bar Chart of Skill Distributions')
@@ -34,7 +34,6 @@ class PMFVisualization(BaseModel):
     def _draw_skills_map(self):
         G = nx.Graph()
         dist = self.pmf.get_skills_distributions()
-        skills = dist.keys()
         #G.add_nodes_from(nodes)
         G.add_edges_from(self.pmf.skills_edges)
 
@@ -67,3 +66,4 @@ class PMFVisualization(BaseModel):
             node_colors.append(color)
         nx.draw(G, pos, with_labels=True, labels=labels, node_size=2000, font_size=10, node_color=node_colors)
         plt.title("Junction tree")
+    

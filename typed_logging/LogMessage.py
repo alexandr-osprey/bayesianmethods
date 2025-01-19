@@ -63,14 +63,14 @@ class PMFNodeUpdatedMessage(LogMessage):
 
 class EvidencePropagatedInPMFMessage(LogMessage):
     log_event: LogEventEnum = LogEventEnum.UpdatedPMF
-    initial: dict
-    updated: dict
-    delta: dict = None
+    initial: list[DiscreteFactor]
+    updated: list[DiscreteFactor]
+    delta: list[DiscreteFactor] = None
 
     def model_post_init(self, __context):
-        self.delta = {}
-        for k in self.updated.keys():
+        self.delta = []
+        for k in range(len(self.updated)):
             v2 = self.updated[k]
             v1 = self.initial[k]
-            self.delta[k] = v2 - v1
+            self.delta.append(v2 + (v1 * -1))
         return super().model_post_init(__context)

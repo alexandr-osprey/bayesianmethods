@@ -59,6 +59,7 @@ class JSONSerializer(logging.Formatter):
             repr[Constants.VALUES] =  self._serialize(obj.values.tolist())
             repr[Constants.CARDINALITY] = obj.cardinality.tolist()
             repr[Constants.REPR] = str(obj)
+            repr[Constants.STATE_NAMES] = self._serialize(obj.state_names)
             return repr
         elif isinstance(obj, Footprint):
             repr = {}

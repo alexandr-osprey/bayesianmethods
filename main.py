@@ -13,6 +13,7 @@ from datetime import datetime
 import pgmpy
 import inject
 from visualization.PMFVisualization import PMFVisualization
+from runs_analysis.LogAnalyzer import LogAnalyzer
 
 def print_cpd(cpd):
     backup = TabularCPD._truncate_strtable
@@ -47,7 +48,7 @@ def get_pmf_emfs():
     q_matrix = db.create_q_matrix(full_model)
     emfs = db.create_emfs(full_model, q_matrix)
     emf_collection = EMFCollection(skills=all_skills, emfs=emfs)
-    pmf_builder = PMFBuilder(full_model=full_model, emf_footprints=emf_collection.get_footprints(), skills_edges=list(initial_pmf.edges))
+    pmf_builder = PMFBuilder(full_model=full_model, emf_footprints=emf_collection.get_footprints())
     pmf = pmf_builder.build()
     return (pmf, emf_collection)
 
@@ -70,7 +71,7 @@ scope = f"run{now.strftime("%Y%m%dT%H%M%S")}"
 logger.start_scope(scope)
 belief_updater = BeliefUpdater(pmf=pmf, emfs=emf_collection)
 visualization.pmf_map()
-visualization.pmf_dist("before")
+#visualization.pmf_dist("before")
 skill_1_true = DiscreteFactor(["s1"], cardinality=[2], values=[0, 1])
 #belief_updater.condition_on_skill(skill_1_true)
 belief_updater.propagate_evidence(('item6', 'true'))
@@ -90,5 +91,9 @@ belief_updater.propagate_evidence(('item19', 'false'))
 belief_updater.propagate_evidence(('item10', 'false'))
 # visualization.pmf_dist("after")
 print(scope)
+
+analyzer = LogAnalyzer()
+run_entries = analyzer.parse_last_entry()
+analyzer.get_pmf_dynamics()
 
 # %%

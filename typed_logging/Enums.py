@@ -35,3 +35,4 @@ class Constants:
     LEVEL='level'
     TIMESTAMP_FORMAT='%Y-%m-%d %H:%M:%S'
     MESSAGE_HASH='message_hash'
+    STATE_NAMES='state_names'
