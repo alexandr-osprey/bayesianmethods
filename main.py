@@ -94,6 +94,6 @@ print(scope)
 
 analyzer = LogAnalyzer()
 run_entries = analyzer.parse_last_entry()
-analyzer.get_pmf_dynamics()
+visualization.skills_dynamics(analyzer.get_pmf_dynamics())
 
 # %%

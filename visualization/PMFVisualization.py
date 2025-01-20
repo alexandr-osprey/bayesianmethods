@@ -31,8 +31,21 @@ class PMFVisualization(BaseModel):
         plt.tight_layout()  # Adjust layout to fit labels
         plt.show()
     
+    def skills_dynamics(self, df: pd.DataFrame) -> None:
+        ordered_skills = df['skill'].drop_duplicates().sort_values().array
+        all_state_names = df.columns.drop(labels=['skill', 'evidence']).array
+        evidence = df['evidence'].drop_duplicates(keep='first').array
+        for state_name in all_state_names:
+            values = []
+            for skill in ordered_skills:
+                values.append(df[df['skill'] == skill][state_name])
+            
+            values = np.transpose(values)
+            state_df = pd.DataFrame(data=values, columns=ordered_skills, index=evidence)
+            self._plot_skills_state(state_df, state_name)
+    
     def _draw_skills_map(self):
-        G = nx.Graph()
+        G = nx.DiGraph()
         dist = self.pmf.get_skills_distributions()
         #G.add_nodes_from(nodes)
         G.add_edges_from(self.pmf.skills_edges)
@@ -66,4 +79,10 @@ class PMFVisualization(BaseModel):
             node_colors.append(color)
         nx.draw(G, pos, with_labels=True, labels=labels, node_size=2000, font_size=10, node_color=node_colors)
         plt.title("Junction tree")
+    
+    def _plot_skills_state(self, df: pd.DataFrame, state_name: str) -> None:
+        print(df)
+        fig, ax = plt.subplots(figsize=(12, 6))
+        df.plot(kind='line', ax=ax, title=f"Skills <{state_name}>")
+        ax.set_xticklabels(ax.get_xticklabels(), rotation=45)
     
