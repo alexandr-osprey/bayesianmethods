@@ -35,20 +35,13 @@ class EMF(BaseModel):
         observables_factor = self.factor.marginalize(variables=self.footprint, inplace=False).normalize(inplace=False)
         return observables_factor
 
-    def get_virtual_evidence_dist(self, observable: str, value: str) -> DiscreteFactor:
+    def get_footprint_virtual_evidence_dist(self, observable: str, value: str) -> DiscreteFactor:
         if not observable in self.observables:
             raise Exception(f"Observable {observable} not in EMF {self.name}")
         
-        f = self.factor
-        variables = f.variables.copy()
-        index = f.state_names[observable].index(value)
-        evidence_var_index = f.variables.index(observable)
-        variables.pop(evidence_var_index)
-        cardinality = np.delete(f.cardinality, evidence_var_index)
-        values = np.take(f.values, index, axis=evidence_var_index)
-        state_names = f.state_names.copy()
-        state_names.pop(observable)
-        observable_factor = DiscreteFactor(variables, cardinality=cardinality, values=values, state_names=state_names)
+        left_observables = set(self.observables) - set([observable])
+        p_new = self.factor.reduce([(observable, value)], inplace=False)\
+            .marginalize(variables=left_observables, inplace=False)
 
         p_old = self.get_footprint_dist()
-        return observable_factor / p_old
+        return p_new / p_old

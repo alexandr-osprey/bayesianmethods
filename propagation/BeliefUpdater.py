@@ -36,7 +36,7 @@ class BeliefUpdater(BaseModel):
         name = evidence[0]
         emf = self.emfs.get_emf_by_name(name)
 
-        evidence_factor = emf.get_virtual_evidence_dist(evidence[0], evidence[1])
+        evidence_factor = emf.get_footprint_virtual_evidence_dist(evidence[0], evidence[1])
 
         self.pmf_propagation.propagate(evidence_factor)
         self.emfs.remove_emf_by_name(name)
