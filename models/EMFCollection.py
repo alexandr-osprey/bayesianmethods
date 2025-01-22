@@ -3,56 +3,26 @@ import pandas as pd
 import numpy as np
 from pydantic import BaseModel
 from models.Footprint import Footprint
+from models.EMF import EMF
 
 class EMFCollection(BaseModel):
-    skills: list[str]
-    emfs: list[DiscreteFactor]
-    df: pd.DataFrame = None
+    emfs: list[EMF]
 
     class Config:
-        arbitrary_types_allowed = True 
+        arbitrary_types_allowed = True
 
-    def model_post_init(self, __context):
-        self._set_footprints(self.emfs)
-
-    def _set_footprints(self, emfs: list[DiscreteFactor]) -> None:        
-        footprints = []
-        items = []
-        for emf in emfs:
-            footprint =  self._get_footprint(emf)
-            item = self._get_item(emf)
-            footprints.append(footprint)
-            items.append(item)
+    def get_emf_by_name(self, name: str) -> EMF: 
+        emf = [e for e in self.emfs if e.name == name]
+        if not emf:
+            raise Exception(f"Could not find EMF {name}")
         
-        self.df = pd.DataFrame(data=np.vstack((footprints, emfs)).transpose(), columns=['footprint', 'emf'], index=items)
-        self.df.index.name = 'item'
+        return emf[0]
     
-    def get_emf_by_item(self, item: str) -> DiscreteFactor: 
-        df = self.df
-        return df.loc[item]['emf']
+    def get_footprints(self) -> set[Footprint]:
+        return set([emf.footprint for emf in self.emfs])
     
-    def get_footprints(self) -> list[Footprint]:
-        footprints = np.unique(self.df['footprint']).tolist()
-        return footprints
+    def get_emfs_by_footprint(self, footprint: Footprint) -> list[EMF]:
+        return [emf for emf in self.emfs if emf.footprint == footprint]
     
-    def get_emfs_by_footprint(self, footprint: Footprint) -> list[DiscreteFactor]:
-        return self.df[self.df['footprint'] == footprint]['emf'].tolist()
-    
-    def normalize(self):
-        for row in self.df.iterrows():
-            row['factor'].normalize()
-    
-    def remove_emf_by_item(self, item: str) -> None:
-        df = self.df
-        self.df = df.drop(index=item)
-
-    def update_emfs(self, emfs: list[DiscreteFactor]) -> None:
-        df = self.df
-        items = [self._get_item(e) for e in emfs]
-        df.loc[items, 'emf'] = emfs
-    
-    def _get_item(self, emf: DiscreteFactor) -> str:
-        return [v for v in emf.variables if v not in self.skills][0]
-    
-    def _get_footprint(self, emf) -> Footprint:
-        return Footprint(nodes=[v for v in emf.variables if v in self.skills])
+    def remove_emf_by_name(self, name: str) -> None:
+        self.emfs = [emf for emf in self.emfs if emf.name != name]

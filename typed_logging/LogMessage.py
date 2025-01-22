@@ -29,13 +29,13 @@ class EMFUpdateMessage(LogMessage):
     #initial_footprint_dist: DiscreteFactor
     #new_footprint_dist: DiscreteFactor
     coefs: DiscreteFactor
-    updated_emf: DiscreteFactor
-    pure_item: DiscreteFactor
+    updated_emf_factor: DiscreteFactor
+    pure_observables: DiscreteFactor
     log_event: LogEventEnum = LogEventEnum.EMFUpdate
     delta: DiscreteFactor = None
 
     def model_post_init(self, __context):
-        self.delta = self.updated_emf + (-1 * self.initial_emf)
+        self.delta = self.updated_emf_factor + (-1 * self.initial_emf)
         return super().model_post_init(__context)
 
 class PMFNodeUpdatedMessage(LogMessage):

@@ -27,8 +27,8 @@ def get_pmf_emfs():
     all_skills = [str(n) for n in initial_pmf.nodes]
     full_model = db.create_full_model(initial_pmf)
     q_matrix = db.create_q_matrix(all_skills, full_model)
-    emfs = db.create_emfs(full_model, q_matrix)
-    emf_collection = EMFCollection(skills=all_skills, emfs=emfs)
+    emfs = db.create_emfs(full_model, q_matrix, skills=all_skills)
+    emf_collection = EMFCollection(emfs=emfs)
     pmf_builder = PMFBuilder(full_model=full_model, emf_footprints=emf_collection.get_footprints(), skills=all_skills)
     pmf = pmf_builder.build()
     return (pmf, emf_collection)
