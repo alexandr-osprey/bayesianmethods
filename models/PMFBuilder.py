@@ -8,12 +8,12 @@ from pgmpy.factors.discrete import DiscreteFactor
 class PMFBuilder(BaseModel):
     full_model: BayesianNetwork
     emf_footprints: list[Footprint]
+    skills: list[str]
 
     class Config:
         arbitrary_types_allowed = True 
     
     def build(self) -> PMFTree:
-        skills = self._get_skills_nodes()
         footprints = self.emf_footprints
         footprints.sort(key=lambda x: len(x))
         redundant_footprints = []
@@ -43,7 +43,7 @@ class PMFBuilder(BaseModel):
         cliques.sort()
 
         #jt.add_nodes_from([tuple(node) for node in st.nodes])
-        cpds_dict = {s: self.full_model.get_cpds(s).to_factor() for s in skills}
+        cpds_dict = {s: self.full_model.get_cpds(s).to_factor() for s in self.skills}
         for node in cliques:
             joint = self._get_factors_for_node(node, cpds_dict)
             cliques_factors[node] = joint
@@ -88,7 +88,7 @@ class PMFBuilder(BaseModel):
         for k in junctions_neighbors.keys():
             junctions_neighbors[k] = frozenset(junctions_neighbors[k])
 
-        directed_edges = [e for e in self.full_model.edges if e[0] in skills and e[1] in skills]
+        directed_edges = [e for e in self.full_model.edges if e[0] in self.skills and e[1] in self.skills]
         pmf = PMFTree(
             clique_factors=cliques_factors, 
             clique_neighbors=cliques_neighbours, 
@@ -98,9 +98,6 @@ class PMFBuilder(BaseModel):
             skills_edges=directed_edges)
 
         return pmf
-    
-    def _get_skills_nodes(self):
-        return [node for node in self.full_model.nodes() if node.startswith('s')]
     
     def _get_factors_for_node(self, node, cpds_dict) -> DiscreteFactor:
         factors = [cpds_dict[e] for e in node]

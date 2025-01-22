@@ -21,34 +21,15 @@ def print_cpd(cpd):
     print(cpd)
     TabularCPD._truncate_strtable = backup
 
-def display_emfs(emfs):
-    for emf in emfs:
-        print(emf.edges)
-        for cpd in emf.get_cpds():
-            print_cpd(cpd)
-
-def update_pmf(pmf, all_skills, factor):
-    inference = BPM(pmf)
-    footprint = [n for n in factor.variables if n in all_skills]
-    factor.marginalize(set(factor.variables) - set(footprint))
-    print(factor)
-    inference.query(['s1', 's2', 's3', 's4'], virtual_evidence=[factor])
-    print(inference)
-  
-def get_skill_edges(model):
-    edges = model.edges()
-    edges = [e for e in edges if e[1].startswith('s') and e[0].startswith('s')]
-    return edges
-
 def get_pmf_emfs():
     db = FullDataBuilder()
     initial_pmf = db.create_initial_pmf()
     all_skills = [str(n) for n in initial_pmf.nodes]
     full_model = db.create_full_model(initial_pmf)
-    q_matrix = db.create_q_matrix(full_model)
+    q_matrix = db.create_q_matrix(all_skills, full_model)
     emfs = db.create_emfs(full_model, q_matrix)
     emf_collection = EMFCollection(skills=all_skills, emfs=emfs)
-    pmf_builder = PMFBuilder(full_model=full_model, emf_footprints=emf_collection.get_footprints())
+    pmf_builder = PMFBuilder(full_model=full_model, emf_footprints=emf_collection.get_footprints(), skills=all_skills)
     pmf = pmf_builder.build()
     return (pmf, emf_collection)
 

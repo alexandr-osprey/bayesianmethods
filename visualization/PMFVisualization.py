@@ -82,7 +82,7 @@ class PMFVisualization(BaseModel):
     
     def _plot_skills_state(self, df: pd.DataFrame, state_name: str) -> None:
         print(df)
-        fig, ax = plt.subplots(figsize=(12, 6))
+        fig, ax = plt.subplots()
         df.plot(kind='line', ax=ax, title=f"Skills <{state_name}>")
         ax.set_xticklabels(ax.get_xticklabels(), rotation=45)
     
